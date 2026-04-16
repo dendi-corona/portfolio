@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Terminal, Server, Cloud, Brain, Code2, Mail, Github, Linkedin, ExternalLink, ArrowDown, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Terminal, Server, Cloud, Brain, Code2, Mail, Github, ExternalLink, ArrowDown, ArrowRight, CheckCircle2, User } from "lucide-react";
 import { useRef } from "react";
 
 // Skills data
@@ -342,7 +342,7 @@ function Contact() {
             rel="noopener noreferrer"
             className="p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
           >
-            <Linkedin className="w-6 h-6" />
+            <User className="w-6 h-6" />
           </a>
         </div>
       </div>
