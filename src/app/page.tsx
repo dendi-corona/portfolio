@@ -1,618 +1,377 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Terminal, Cpu, Network, Brain, Code, Mail, SquareArrowOutUpRight, User, ChevronDown, Sparkles, Zap, Shield, Cloud } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Terminal, Server, Cloud, Brain, Code2, Mail, Github, Linkedin, ExternalLink, ArrowDown, ArrowRight, CheckCircle2 } from "lucide-react";
+import { useRef } from "react";
 
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 80 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.3 }
-  }
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
-};
-
+// Skills data
 const skills = [
-  { name: "System Administration", icon: Terminal, level: 95, color: "#00d4ff", desc: "Windows, Linux, Active Directory" },
-  { name: "Network Infrastructure", icon: Network, level: 90, color: "#7b2cbf", desc: "Cisco, Firewalls, VLANs" },
-  { name: "Cloud & DevOps", icon: Cloud, level: 85, color: "#f72585", desc: "AWS, Azure, Docker, K8s" },
-  { name: "AI / Machine Learning", icon: Brain, level: 70, color: "#00ff88", desc: "Python, TensorFlow, LLMs" },
-  { name: "Automation", icon: Zap, level: 88, color: "#ffaa00", desc: "PowerShell, Python, Bash" },
-  { name: "Security", icon: Shield, level: 82, color: "#ff4757", desc: "Hardening, Monitoring, Compliance" },
+  { category: "Infrastructure", items: ["Windows/Linux Server", "Active Directory", "VMware/Hyper-V", "PowerShell/Bash"] },
+  { category: "Networking", items: ["Cisco/Juniper", "Firewalls (pfSense, ASA)", "VLANs/Subnetting", "Load Balancers"] },
+  { category: "Cloud & DevOps", items: ["AWS/Azure", "Docker/Kubernetes", "Terraform", "CI/CD Pipelines"] },
+  { category: "AI & Automation", items: ["Python", "TensorFlow/PyTorch", "LLM Fine-tuning", "ML Ops"] },
 ];
 
 const projects = [
   {
-    title: "AI-Powered Infrastructure Monitoring",
-    description: "Predictive anomaly detection system using ML algorithms to identify infrastructure issues before they occur. Reduced downtime by 73%.",
-    tags: ["Python", "TensorFlow", "Prometheus", "Grafana", "Elasticsearch"],
-    gradient: "from-cyan-500 via-blue-500 to-purple-500",
-    metric: "73% ↓ Downtime"
+    title: "AI Infrastructure Monitoring",
+    description: "Machine learning system for predictive infrastructure monitoring. Detects anomalies 48h before failure.",
+    tech: ["Python", "TensorFlow", "Prometheus", "Grafana"],
+    link: "#",
+    image: "gradient-1"
   },
   {
-    title: "Zero-Downtime Cloud Migration",
-    description: "Architected and executed seamless migration of 200+ VMs to AWS with automated rollback and real-time monitoring.",
-    tags: ["AWS", "Terraform", "Kubernetes", "CI/CD", "Ansible"],
-    gradient: "from-purple-500 via-pink-500 to-red-500",
-    metric: "200+ VMs Migrated"
+    title: "Cloud Migration Framework",
+    description: "Automated framework for zero-downtime migration of 200+ enterprise VMs to AWS.",
+    tech: ["AWS", "Terraform", "Python", "Ansible"],
+    link: "#",
+    image: "gradient-2"
   },
   {
-    title: "Intelligent Security Dashboard",
-    description: "Real-time threat detection platform with AI-powered log analysis and automated incident response workflows.",
-    tags: ["React", "Node.js", "SIEM", "Python", "Security"],
-    gradient: "from-orange-500 via-red-500 to-pink-500",
-    metric: "99.9% Threat Detection"
-  },
-  {
-    title: "Automated Backup & DR System",
-    description: "Enterprise backup solution with intelligent scheduling, compression, and one-click disaster recovery.",
-    tags: ["PowerShell", "Python", "AWS S3", "Automation"],
-    gradient: "from-green-500 via-teal-500 to-cyan-500",
-    metric: "100% Recovery Rate"
+    title: "Security Operations Dashboard",
+    description: "Real-time security monitoring with automated incident response and threat intelligence.",
+    tech: ["React", "Elasticsearch", "Python", "SIEM"],
+    link: "#",
+    image: "gradient-3"
   }
 ];
 
 const experiences = [
   {
-    role: "IT System Administrator",
-    company: "Enterprise Environment",
-    period: "2022 - Present",
-    description: "Managing 500+ servers, 2000+ users, and critical infrastructure. Implemented automation reducing manual work by 60%.",
-    achievements: ["99.99% uptime", "60% automation", "500+ servers"]
+    role: "Senior IT System Administrator",
+    company: "Enterprise Corporation",
+    period: "2022 — Present",
+    description: "Leading infrastructure operations for 500+ servers and 2000+ users across multiple data centers.",
+    achievements: [
+      "Achieved 99.99% uptime across all critical systems",
+      "Reduced manual operations by 60% through automation",
+      "Led cloud migration saving $200K annually"
+    ]
   },
   {
-    role: "AI & ML Practitioner",
-    company: "Self-Directed Learning",
-    period: "2024 - Present",
-    description: "Deep dive into neural networks, LLMs, and practical AI applications for IT operations.",
-    achievements: ["10+ projects", "TensorFlow certified", "LLM fine-tuning"]
+    role: "IT Administrator",
+    company: "Tech Company",
+    period: "2019 — 2022",
+    description: "Managed day-to-day IT operations, network infrastructure, and security compliance.",
+    achievements: [
+      "Implemented company-wide security hardening",
+      "Deployed automated backup and DR solution",
+      "Reduced helpdesk tickets by 40%"
+    ]
   }
 ];
 
-// Animated background component
-function AnimatedBackground() {
+// Components
+function NavBar() {
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
-      
-      {/* Grid pattern */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
-        }}
-      />
-    </div>
+    <motion.nav 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/10"
+    >
+      <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="#" className="text-lg font-bold tracking-tight">DV</a>
+        <div className="hidden md:flex gap-8 text-sm">
+          <a href="#about" className="text-white/60 hover:text-white transition-colors">About</a>
+          <a href="#skills" className="text-white/60 hover:text-white transition-colors">Skills</a>
+          <a href="#projects" className="text-white/60 hover:text-white transition-colors">Projects</a>
+          <a href="#experience" className="text-white/60 hover:text-white transition-colors">Experience</a>
+          <a href="#contact" className="text-white/60 hover:text-white transition-colors">Contact</a>
+        </div>
+      </div>
+    </motion.nav>
   );
 }
 
-// Floating particles
-function Particles() {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number; duration: number }>>([]);
-
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 50 }).map((_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: Math.random() * 4 + 1,
-        duration: Math.random() * 20 + 10
-      }))
-    );
-  }, []);
+function Hero() {
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
+    <section className="min-h-screen flex items-center justify-center px-6 pt-20">
+      <motion.div style={{ y, opacity }} className="text-center max-w-4xl">
         <motion.div
-          key={p.id}
-          className="absolute rounded-full bg-white/20"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size
-          }}
-          animate={{
-            y: [0, -100, 0],
-            opacity: [0, 0.5, 0]
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-      ))}
-    </div>
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-sm font-medium text-white/50 mb-4 uppercase tracking-widest">Portfolio</p>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            Duy Vo
+          </h1>
+          <p className="text-xl md:text-2xl text-white/60 mb-8 font-light">
+            IT System Administrator <span className="text-white/30 mx-3">•</span> AI Enthusiast
+          </p>
+          <p className="text-lg text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Building resilient infrastructure and exploring the intersection of IT operations and artificial intelligence.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a 
+              href="#projects"
+              className="px-6 py-3 bg-white text-black font-medium hover:bg-white/90 transition-colors"
+            >
+              View Projects
+            </a>
+            <a 
+              href="#contact"
+              className="px-6 py-3 border border-white/20 font-medium hover:bg-white/5 transition-colors"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2"
+        >
+          <ArrowDown className="w-5 h-5 text-white/30 animate-bounce" />
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+}
+
+function About() {
+  return (
+    <section id="about" className="py-24 px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-16">
+          <div>
+            <h2 className="text-3xl font-bold mb-6">About Me</h2>
+            <div className="space-y-4 text-white/60 leading-relaxed">
+              <p>
+                I'm an experienced IT System Administrator with a passion for building 
+                reliable, scalable infrastructure that powers modern businesses.
+              </p>
+              <p>
+                Currently, I'm diving deep into Artificial Intelligence and Machine Learning, 
+                exploring how AI can transform IT operations through predictive maintenance, 
+                intelligent automation, and self-healing systems.
+              </p>
+              <p>
+                When I'm not managing infrastructure or training models, you'll find me 
+                experimenting with new technologies, contributing to open source, or 
+                sharing knowledge with the community.
+              </p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold mb-6">Quick Facts</h3>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <div className="text-3xl font-bold text-white mb-1">500+</div>
+                <div className="text-sm text-white/40">Servers Managed</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-white mb-1">99.99%</div>
+                <div className="text-sm text-white/40">Uptime Achieved</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-white mb-1">60%</div>
+                <div className="text-sm text-white/40">Automation Rate</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-white mb-1">5+</div>
+                <div className="text-sm text-white/40">Years Experience</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Skills() {
+  return (
+    <section id="skills" className="py-24 px-6 bg-white/[0.02]">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-12">Skills & Expertise</h2>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          {skills.map((skill) => (
+            <div key={skill.category} className="p-6 border border-white/10 rounded-lg">
+              <h3 className="text-lg font-semibold mb-4">{skill.category}</h3>
+              <ul className="space-y-2">
+                {skill.items.map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-white/60">
+                    <CheckCircle2 className="w-4 h-4 text-white/30" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Projects() {
+  return (
+    <section id="projects" className="py-24 px-6">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-12">Featured Projects</h2>
+        
+        <div className="space-y-12">
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.title}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: index * 0.1 }}
+              className="group"
+            >
+              <div className="grid md:grid-cols-3 gap-8 items-start">
+                <div className="md:col-span-2">
+                  <h3 className="text-2xl font-bold mb-3 group-hover:text-white/80 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-white/60 mb-4 leading-relaxed">
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.tech.map((tech) => (
+                      <span 
+                        key={tech}
+                        className="px-3 py-1 text-xs bg-white/5 border border-white/10 rounded-full"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  <a 
+                    href={project.link}
+                    className="inline-flex items-center gap-2 text-sm font-medium hover:gap-3 transition-all"
+                  >
+                    View Project <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+                <div className={`h-48 rounded-lg bg-gradient-to-br ${
+                  project.image === "gradient-1" ? "from-cyan-500/20 to-blue-500/20" :
+                  project.image === "gradient-2" ? "from-purple-500/20 to-pink-500/20" :
+                  "from-orange-500/20 to-red-500/20"
+                } border border-white/10`} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Experience() {
+  return (
+    <section id="experience" className="py-24 px-6 bg-white/[0.02]">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold mb-12">Experience</h2>
+        
+        <div className="space-y-12">
+          {experiences.map((exp, index) => (
+            <motion.div
+              key={exp.role}
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: index * 0.1 }}
+              className="relative pl-8 border-l border-white/10"
+            >
+              <div className="absolute left-0 top-2 w-2 h-2 rounded-full bg-white/30 -translate-x-1/2" />
+              
+              <div className="flex flex-wrap items-center gap-4 mb-2">
+                <h3 className="text-xl font-bold">{exp.role}</h3>
+                <span className="text-sm text-white/40">{exp.period}</span>
+              </div>
+              
+              <p className="text-white/60 mb-4">{exp.company}</p>
+              <p className="text-white/50 mb-4 leading-relaxed">{exp.description}</p>
+              
+              <ul className="space-y-2">
+                {exp.achievements.map((achievement) => (
+                  <li key={achievement} className="flex items-start gap-3 text-white/50 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-white/30 mt-0.5 flex-shrink-0" />
+                    <span>{achievement}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Contact() {
+  return (
+    <section id="contact" className="py-24 px-6">
+      <div className="max-w-3xl mx-auto text-center">
+        <h2 className="text-3xl font-bold mb-6">Get In Touch</h2>
+        <p className="text-white/60 mb-12 leading-relaxed">
+          Interested in collaboration or just want to discuss technology? 
+          Feel free to reach out. I'm always open to interesting conversations.
+        </p>
+        
+        <div className="flex justify-center gap-6">
+          <a 
+            href="mailto:your.email@example.com"
+            className="p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+          >
+            <Mail className="w-6 h-6" />
+          </a>
+          <a 
+            href="https://github.com/dendi-corona"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+          >
+            <Github className="w-6 h-6" />
+          </a>
+          <a 
+            href="https://linkedin.com/in/yourusername"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+          >
+            <Linkedin className="w-6 h-6" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="py-12 px-6 border-t border-white/10">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/40">
+        <p>© 2024 Duy Vo</p>
+        <p>Built with Next.js & Tailwind CSS</p>
+      </div>
+    </footer>
   );
 }
 
 export default function Home() {
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-
   return (
-    <main className="bg-[#030712] min-h-screen text-white overflow-x-hidden">
-      <AnimatedBackground />
-      <Particles />
-
-      {/* Navigation */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/40 border-b border-white/10"
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <motion.div 
-            className="text-2xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-            whileHover={{ scale: 1.05 }}
-          >
-            DV
-          </motion.div>
-          <div className="hidden md:flex gap-8">
-            {["Home", "About", "Skills", "Projects", "Experience", "Contact"].map((item) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-white/60 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider"
-                whileHover={{ y: -2 }}
-              >
-                {item}
-              </motion.a>
-            ))}
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center justify-center px-6 pt-20 relative">
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="text-center max-w-5xl"
-        >
-          <motion.div variants={fadeInUp} className="mb-8">
-            <motion.div 
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-white/20 backdrop-blur-sm"
-              whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.4)" }}
-            >
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span className="text-sm font-medium text-white/80">Welcome to my digital universe</span>
-            </motion.div>
-          </motion.div>
-          
-          <motion.h1 
-            variants={fadeInUp}
-            className="text-6xl md:text-8xl font-black mb-8 leading-tight"
-          >
-            <span className="block">I&apos;m</span>
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Duy Vo
-            </span>
-          </motion.h1>
-          
-          <motion.p 
-            variants={fadeInUp}
-            className="text-xl md:text-2xl text-white/60 mb-4 font-light"
-          >
-            IT System Administrator <span className="text-white/30 mx-4">•</span> AI Enthusiast
-          </motion.p>
-          
-          <motion.p 
-            variants={fadeInUp}
-            className="text-lg text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed"
-          >
-            Building bulletproof infrastructure by day, exploring the frontiers of AI by night. 
-            Where systems meet intelligence.
-          </motion.p>
-          
-          <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 justify-center">
-            <motion.a 
-              href="#projects"
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Explore My Work
-            </motion.a>
-            <motion.a 
-              href="#contact"
-              className="px-8 py-4 rounded-xl border border-white/20 font-semibold hover:bg-white/5 transition-all backdrop-blur-sm"
-              whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.4)" }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Let&apos;s Talk
-            </motion.a>
-          </motion.div>
-
-          <motion.div 
-            style={{ y, opacity }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          >
-            <ChevronDown className="w-8 h-8 text-white/40 animate-bounce" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="py-32 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-5xl font-black text-center mb-20"
-          >
-            About <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Me</span>
-          </motion.h2>
-          
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -80 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              className="space-y-8"
-            >
-              <div className="relative pl-8 border-l-2 border-cyan-500/50">
-                <p className="text-xl text-white/70 leading-relaxed">
-                  I&apos;m an experienced <strong className="text-cyan-400">IT System Administrator</strong> who lives 
-                  at the intersection of <strong className="text-purple-400">infrastructure</strong> and <strong className="text-pink-400">intelligence</strong>.
-                </p>
-              </div>
-              
-              <p className="text-lg text-white/60 leading-relaxed">
-                My day involves architecting resilient systems, automating complex workflows, and ensuring 
-                99.99% uptime for critical infrastructure. I speak fluent PowerShell, Python, and panic-free 
-                incident response.
-              </p>
-              
-              <p className="text-lg text-white/60 leading-relaxed">
-                But here&apos;s the twist: I&apos;m currently diving deep into <strong className="text-pink-400">AI and Machine Learning</strong>, 
-                exploring how neural networks can revolutionize IT operations. Think predictive maintenance, 
-                intelligent automation, and systems that learn from themselves.
-              </p>
-              
-              <div className="flex gap-4 pt-4">
-                <div className="text-center">
-                  <div className="text-3xl font-black text-cyan-400">500+</div>
-                  <div className="text-sm text-white/40">Servers Managed</div>
-                </div>
-                <div className="w-px bg-white/10" />
-                <div className="text-center">
-                  <div className="text-3xl font-black text-purple-400">99.99%</div>
-                  <div className="text-sm text-white/40">Uptime</div>
-                </div>
-                <div className="w-px bg-white/10" />
-                <div className="text-center">
-                  <div className="text-3xl font-black text-pink-400">60%</div>
-                  <div className="text-sm text-white/40">Automation</div>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 80 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              className="relative"
-            >
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 border border-white/10 p-1 backdrop-blur-sm">
-                <div className="h-full rounded-3xl bg-black/40 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-3xl" />
-                  <div className="text-center relative z-10">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Terminal className="w-32 h-32 mx-auto mb-6 text-cyan-400" />
-                    </motion.div>
-                    <p className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                      IT + AI
-                    </p>
-                    <p className="text-white/40 mt-2 text-sm">The Future of Infrastructure</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Skills Section */}
-      <section id="skills" className="py-32 px-6 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-5xl font-black text-center mb-20"
-          >
-            Skills & <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Expertise</span>
-          </motion.h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {skills.map((skill, index) => (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-sm overflow-hidden"
-              >
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{
-                    background: `radial-gradient(circle at top right, ${skill.color}15, transparent 70%)`
-                  }}
-                />
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-4 mb-4">
-                    <motion.div
-                      whileHover={{ rotate: 12, scale: 1.1 }}
-                      className="p-3 rounded-xl bg-white/5"
-                    >
-                      <skill.icon className="w-8 h-8" style={{ color: skill.color }} />
-                    </motion.div>
-                    <h3 className="text-xl font-bold">{skill.name}</h3>
-                  </div>
-                  
-                  <p className="text-white/40 text-sm mb-4">{skill.desc}</p>
-                  
-                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${skill.level}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, ease: "easeOut" }}
-                      className="h-full rounded-full"
-                      style={{ 
-                        background: `linear-gradient(90deg, ${skill.color}, ${skill.color}88)`
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center mt-3">
-                    <span className="text-xs text-white/30">Proficiency</span>
-                    <span className="text-sm font-bold" style={{ color: skill.color }}>{skill.level}%</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-5xl font-black text-center mb-8"
-          >
-            Featured <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Projects</span>
-          </motion.h2>
-          
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center text-white/50 mb-20 max-w-2xl mx-auto"
-          >
-            Real-world solutions that bridge traditional IT infrastructure with cutting-edge AI capabilities
-          </motion.p>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {projects.map((project, index) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: index * 0.15 }}
-                whileHover={{ y: -12 }}
-                className="group relative rounded-3xl bg-white/[0.02] border border-white/10 overflow-hidden backdrop-blur-sm"
-              >
-                {/* Gradient top border */}
-                <div className={`h-1.5 bg-gradient-to-r ${project.gradient}`} />
-                
-                <div className="p-8">
-                  {/* Metric badge */}
-                  <motion.div 
-                    className="inline-block px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <span className="text-sm font-semibold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                      {project.metric}
-                    </span>
-                  </motion.div>
-                  
-                  <h3 className="text-2xl font-bold mb-4 group-hover:text-cyan-400 transition-colors">
-                    {project.title}
-                  </h3>
-                  
-                  <p className="text-white/60 mb-6 leading-relaxed">
-                    {project.description}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white/70"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Hover glow effect */}
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(circle at top right, rgba(0,212,255,0.1), transparent 70%)`
-                  }}
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Experience Section */}
-      <section id="experience" className="py-32 px-6 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
-        <div className="max-w-4xl mx-auto">
-          <motion.h2 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-5xl font-black text-center mb-20"
-          >
-            Experience
-          </motion.h2>
-          
-          <div className="space-y-12">
-            {experiences.map((exp, index) => (
-              <motion.div
-                key={exp.role}
-                initial={{ opacity: 0, x: -60 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ delay: index * 0.2 }}
-                className="relative"
-              >
-                <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-cyan-500 via-purple-500 to-transparent" />
-                
-                <div className="ml-8 pl-8 relative">
-                  <div className="absolute left-0 top-2 w-4 h-4 rounded-full bg-cyan-500 -translate-x-1/2 shadow-lg shadow-cyan-500/50" />
-                  
-                  <div className="flex flex-wrap items-center gap-4 mb-3">
-                    <h3 className="text-2xl font-bold text-cyan-400">{exp.role}</h3>
-                    <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/50">
-                      {exp.period}
-                    </span>
-                  </div>
-                  
-                  <p className="text-lg text-white/70 mb-3">{exp.company}</p>
-                  <p className="text-white/50 mb-6 leading-relaxed">{exp.description}</p>
-                  
-                  <div className="flex flex-wrap gap-3">
-                    {exp.achievements.map((achievement) => (
-                      <motion.div
-                        key={achievement}
-                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-white/10"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <span className="text-sm font-medium text-white/80">{achievement}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="text-5xl font-black mb-8"
-          >
-            Let&apos;s <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Connect</span>
-          </motion.h2>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-xl text-white/60 mb-12 max-w-2xl mx-auto"
-          >
-            Whether you want to discuss infrastructure architecture, AI applications in IT, 
-            or just share tech war stories — I&apos;m always open to great conversations.
-          </motion.p>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex justify-center gap-6"
-          >
-            <motion.a 
-              href="mailto:your.email@example.com"
-              className="group p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all backdrop-blur-sm"
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Mail className="w-7 h-7 text-white/70 group-hover:text-cyan-400 transition-colors" />
-            </motion.a>
-            <motion.a 
-              href="https://github.com/dendi-corona"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-purple-500/20 hover:border-purple-500/50 transition-all backdrop-blur-sm"
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <SquareArrowOutUpRight className="w-7 h-7 text-white/70 group-hover:text-purple-400 transition-colors" />
-            </motion.a>
-            <motion.a 
-              href="https://linkedin.com/in/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-pink-500/20 hover:border-pink-500/50 transition-all backdrop-blur-sm"
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <User className="w-7 h-7 text-white/70 group-hover:text-pink-400 transition-colors" />
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/40 text-sm">
-            © 2024 Duy Vo. Crafted with Next.js, Tailwind & Framer Motion
-          </p>
-          <motion.p 
-            className="text-white/30 text-sm"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            Built for the future of IT
-          </motion.p>
-        </div>
-      </footer>
+    <main className="bg-black min-h-screen text-white">
+      <NavBar />
+      <Hero />
+      <About />
+      <Skills />
+      <Projects />
+      <Experience />
+      <Contact />
+      <Footer />
     </main>
   );
 }
