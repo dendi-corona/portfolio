@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Terminal, Cpu, Network, Brain, Code, Mail, Github, Linkedin, ExternalLink, ChevronDown } from "lucide-react";
+import { Terminal, Cpu, Network, Brain, Code, Mail, SquareArrowOutUpRight, User, ExternalLink, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 // Animation variants
@@ -371,7 +371,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="p-4 rounded-full bg-white/10 border border-white/20 hover:bg-purple-500/20 hover:border-purple-500 transition-all card-hover"
             >
-              <Github className="w-8 h-8" />
+              <SquareArrowOutUpRight className="w-8 h-8" />
             </a>
             <a 
               href="https://linkedin.com/in/yourusername"
@@ -379,7 +379,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="p-4 rounded-full bg-white/10 border border-white/20 hover:bg-blue-500/20 hover:border-blue-500 transition-all card-hover"
             >
-              <Linkedin className="w-8 h-8" />
+              <User className="w-8 h-8" />
             </a>
           </motion.div>
         </div>
